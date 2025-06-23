@@ -5,8 +5,7 @@ import {
   updateMateria as updateMateriaService,
   getMateriaById,
 } from "../../services/materiaService";
-import { getFacultades } from "../../services/facultadService";
-import type { Facultad, TurnoMateria } from "../../types";
+import type { TurnoMateria } from "../../types";
 
 const MateriaForm = () => {
   const { id } = useParams();
@@ -17,9 +16,7 @@ const MateriaForm = () => {
   const [creditos, setCreditos] = useState(0);
   const [turno, setTurno] = useState<TurnoMateria>("mañana");
   const [facultadId, setFacultadId] = useState("");
-  const [facultades, setFacultades] = useState<
-    { id: number; descripcion: string }[]
-  >([
+  const facultades = [
     { id: 1, descripcion: "Facultad de Ciencias Económicas y Empresariales" },
     {
       id: 2,
@@ -31,7 +28,7 @@ const MateriaForm = () => {
     },
     { id: 4, descripcion: "Facultad de Ciencias de la Salud" },
     { id: 5, descripcion: "Facultad de Ciencias y Tecnologías" },
-  ]);
+  ];
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -48,7 +45,11 @@ const MateriaForm = () => {
           setDescripcion(materia.descripcion || "");
           setCreditos(materia.creditos);
           setTurno(materia.turnos);
-          setFacultadId(materia.facultadId.toString());
+          setFacultadId(
+            materia.facultadId !== undefined
+              ? materia.facultadId.toString()
+              : ""
+          );
         })
         .catch((error) => {
           console.error("Error loading materia:", error);

@@ -1,4 +1,3 @@
-import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import FacultadList from "./pages/Facultad/FacultadList";
@@ -11,7 +10,6 @@ import BibliografiaList from "./pages/Bibliografia/BibliografiaList";
 import BibliografiaForm from "./pages/Bibliografia/BibliografiaForm";
 import BibliografiaDetail from "./pages/Bibliografia/BibliografiaDetail";
 import AutorList from "./pages/Autor/AutorList";
-import AutorForm from "./pages/Autor/AutorForm";
 import AutorDetail from "./pages/Autor/AutorDetail";
 import Layout from "./components/Layout";
 import Header from "./components/Header";
@@ -40,7 +38,7 @@ const App = () => {
                 element={<BibliografiaDetail />}
               />
               <Route path="/autor" element={<AutorList />} />
-              <Route path="/autor/new" element={<AutorForm />} />
+              {/* <Route path="/autor/new" element={<AutorForm />} /> */}
               <Route path="/autor/:id" element={<AutorDetail />} />
             </Routes>
           </main>

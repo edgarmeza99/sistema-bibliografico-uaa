@@ -22,7 +22,6 @@ const MateriaList = () => {
   }, []);
 
   const handleDelete = async (id: number | undefined) => {
-    console.log("handleDelete called with id:", id);
     // Verificar que el ID existe
     if (!id) {
       alert("Error: ID de materia no válido");
@@ -33,7 +32,6 @@ const MateriaList = () => {
     const materia = materias.find((m) => m.id === id);
     if (!materia) return;
 
-    console.log("Setting deleteConfirm to:", { isOpen: true, materia });
     // Mostrar modal de confirmación
     setDeleteConfirm({ isOpen: true, materia });
   };
