@@ -31,6 +31,7 @@ const MateriaForm = () => {
   ];
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
@@ -38,6 +39,7 @@ const MateriaForm = () => {
 
     if (id) {
       setIsEditing(true);
+      setLoadingData(true);
       getMateriaById(id)
         .then((materia) => {
           setNombre(materia.nombre_materia);
@@ -53,6 +55,9 @@ const MateriaForm = () => {
         })
         .catch((error) => {
           console.error("Error loading materia:", error);
+        })
+        .finally(() => {
+          setLoadingData(false);
         });
     }
   }, [id]);
@@ -116,6 +121,28 @@ const MateriaForm = () => {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
+      {/* Loading indicator for data fetching */}
+      {loadingData && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-3"></div>
+            <div className="text-blue-700 text-sm">
+              Cargando datos de la materia...
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Debug info */}
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm">
+        <p>
+          <strong>Debug:</strong>
+        </p>
+        <p>ID: {id || "No ID"}</p>
+        <p>Is Editing: {isEditing ? "Sí" : "No"}</p>
+        <p>Loading Data: {loadingData ? "Sí" : "No"}</p>
+      </div>
+
       {/* Breadcrumb */}
       <nav className="flex items-center space-x-2 text-sm text-gray-500">
         <Link to="/materia" className="hover:text-green-600 transition-colors">

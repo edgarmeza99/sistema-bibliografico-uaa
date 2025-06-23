@@ -30,6 +30,7 @@ const App = () => {
               <Route path="/facultad/:id" element={<FacultadDetail />} />
               <Route path="/materia" element={<MateriaList />} />
               <Route path="/materia/new" element={<MateriaForm />} />
+              <Route path="/materia/edit/:id" element={<MateriaForm />} />
               <Route path="/materia/:id" element={<MateriaDetail />} />
               <Route path="/bibliografia" element={<BibliografiaList />} />
               <Route path="/bibliografia/new" element={<BibliografiaForm />} />
