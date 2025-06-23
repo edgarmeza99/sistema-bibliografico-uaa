@@ -22,16 +22,18 @@ const MateriaList = () => {
   }, []);
 
   const handleDelete = async (id: number | undefined) => {
+    console.log("handleDelete called with id:", id);
     // Verificar que el ID existe
     if (!id) {
-      alert('Error: ID de materia no válido');
+      alert("Error: ID de materia no válido");
       return;
     }
 
     // Encontrar la materia completa
-    const materia = materias.find(m => m.id === id);
+    const materia = materias.find((m) => m.id === id);
     if (!materia) return;
 
+    console.log("Setting deleteConfirm to:", { isOpen: true, materia });
     // Mostrar modal de confirmación
     setDeleteConfirm({ isOpen: true, materia });
   };
@@ -43,11 +45,13 @@ const MateriaList = () => {
     try {
       await deleteMateria(deleteConfirm.materia.id);
       // Actualizar la lista eliminando la materia del estado
-      setMaterias(materias.filter(materia => materia.id !== deleteConfirm.materia?.id));
+      setMaterias(
+        materias.filter((materia) => materia.id !== deleteConfirm.materia?.id)
+      );
       setDeleteConfirm({ isOpen: false, materia: null });
     } catch (error) {
-      console.error('Error al eliminar la materia:', error);
-      alert('Error al eliminar la materia. Por favor, intenta de nuevo.');
+      console.error("Error al eliminar la materia:", error);
+      alert("Error al eliminar la materia. Por favor, intenta de nuevo.");
     } finally {
       setLoading(false);
     }
@@ -200,12 +204,12 @@ const MateriaList = () => {
                     >
                       Editar
                     </Link>
-                    <button 
+                    <button
                       onClick={() => handleDelete(materia.id)}
                       disabled={loading}
                       className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {loading ? 'Eliminando...' : 'Eliminar'}
+                      {loading ? "Eliminando..." : "Eliminar"}
                     </button>
                   </div>
                 </td>

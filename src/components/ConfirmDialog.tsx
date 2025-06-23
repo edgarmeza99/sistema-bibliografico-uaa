@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from "react";
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -8,7 +8,7 @@ interface ConfirmDialogProps {
   onCancel: () => void;
   confirmText?: string;
   cancelText?: string;
-  type?: 'danger' | 'warning' | 'info';
+  type?: "danger" | "warning" | "info";
 }
 
 const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
@@ -17,37 +17,27 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   message,
   onConfirm,
   onCancel,
-  confirmText = 'Confirmar',
-  cancelText = 'Cancelar',
-  type = 'danger'
+  confirmText = "Confirmar",
+  cancelText = "Cancelar",
+  type = "danger",
 }) => {
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
 
   // Manejar la tecla Escape y focus inicial
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && isOpen) {
+      if (event.key === "Escape" && isOpen) {
         onCancel();
       }
     };
 
     if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener("keydown", handleKeyDown);
       // Prevenir el scroll del body cuando el modal está abierto
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
       // Focus en el botón de cancelar
       setTimeout(() => {
         cancelButtonRef.current?.focus();
-      }, 100);
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen, onCancel]);
-
-  if (!isOpen) return null;
       }, 100);
     }
 
@@ -86,26 +76,22 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   const styles = typeStyles[type];
 
   const handleBackdropClick = (e: React.MouseEvent) => {
-    console.log("Backdrop clicked");
     if (e.target === e.currentTarget) {
-      console.log("Calling onCancel from backdrop");
       onCancel();
     }
   };
 
   const handleConfirm = () => {
-    console.log("Confirm button clicked");
     onConfirm();
   };
 
   const handleCancel = () => {
-    console.log("Cancel button clicked");
     onCancel();
   };
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-400 bg-opacity-100"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
@@ -113,7 +99,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
     >
       {/* Modal */}
       <div
-        className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-auto"
+        className="relative bg-white  rounded-lg shadow-xl max-w-md w-full mx-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Content */}
