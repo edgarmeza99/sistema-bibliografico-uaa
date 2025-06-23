@@ -66,7 +66,7 @@ const Dashboard = () => {
           Acciones Rápidas
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Link
+          {/* <Link
             to="/facultad/new"
             className="flex items-center space-x-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors group"
           >
@@ -76,7 +76,7 @@ const Dashboard = () => {
             <span className="font-medium text-gray-700 group-hover:text-blue-600">
               Nueva Facultad
             </span>
-          </Link>
+          </Link> */}
           <Link
             to="/materia/new"
             className="flex items-center space-x-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors group"
@@ -88,7 +88,7 @@ const Dashboard = () => {
               Nueva Materia
             </span>
           </Link>
-          <Link
+          {/* <Link
             to="/bibliografia/new"
             className="flex items-center space-x-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors group"
           >
@@ -109,7 +109,7 @@ const Dashboard = () => {
             <span className="font-medium text-gray-700 group-hover:text-orange-600">
               Nuevo Autor
             </span>
-          </Link>
+          </Link> */}
         </div>
       </div>
 
