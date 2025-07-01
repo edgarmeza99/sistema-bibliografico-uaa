@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { getMaterias, deleteMateria } from "../../services/materiaService";
 import type { Materia } from "../../types";
 import ConfirmDialog from "../../components/ConfirmDialog";
+import { useToast } from "../../components/ToastProvider";
 
 const MateriaList = () => {
   const [materias, setMaterias] = useState<Materia[]>([]);
@@ -11,6 +12,7 @@ const MateriaList = () => {
     isOpen: boolean;
     materia: Materia | null;
   }>({ isOpen: false, materia: null });
+  const { showSuccess, showError } = useToast();
 
   useEffect(() => {
     const fetchMaterias = async () => {
@@ -24,7 +26,7 @@ const MateriaList = () => {
   const handleDelete = async (id: number | undefined) => {
     // Verificar que el ID existe
     if (!id) {
-      alert("Error: ID de materia no válido");
+      showError("Error", "ID de materia no válido");
       return;
     }
 
@@ -47,9 +49,16 @@ const MateriaList = () => {
         materias.filter((materia) => materia.id !== deleteConfirm.materia?.id)
       );
       setDeleteConfirm({ isOpen: false, materia: null });
+      showSuccess(
+        "Eliminado exitosamente",
+        "La materia ha sido eliminada correctamente"
+      );
     } catch (error) {
       console.error("Error al eliminar la materia:", error);
-      alert("Error al eliminar la materia. Por favor, intenta de nuevo.");
+      showError(
+        "Error al eliminar", 
+        "No se pudo eliminar la materia. Por favor, intenta de nuevo."
+      );
     } finally {
       setLoading(false);
     }
