@@ -1,10 +1,19 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getFacultades } from "../../services/facultadService";
+import { getFacultades, deleteFacultad } from "../../services/facultadService";
 import type { Facultad } from "../../types";
+import ConfirmDialog from "../../components/ConfirmDialog";
+import { useToast } from "../../components/ToastProvider";
 
 const FacultadList = () => {
   const [facultades, setFacultades] = useState<Facultad[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    isOpen: boolean;
+    facultad: Facultad | null;
+  }>({ isOpen: false, facultad: null });
+
+  const { showSuccess, showError } = useToast();
 
   useEffect(() => {
     const fetchFacultades = async () => {
@@ -14,6 +23,53 @@ const FacultadList = () => {
 
     fetchFacultades();
   }, []);
+
+  const handleDelete = async (id: string | undefined) => {
+    // Verificar que el ID existe
+    if (!id) {
+      showError("Error", "ID de facultad no válido");
+      return;
+    }
+
+    // Encontrar la facultad completa
+    const facultad = facultades.find((f) => f.id === id);
+    if (!facultad) return;
+
+    // Mostrar modal de confirmación
+    setDeleteConfirm({ isOpen: true, facultad });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteConfirm.facultad?.id) return;
+
+    setLoading(true);
+    try {
+      await deleteFacultad(deleteConfirm.facultad.id);
+      // Actualizar la lista eliminando la facultad del estado
+      setFacultades(
+        facultades.filter(
+          (facultad) => facultad.id !== deleteConfirm.facultad?.id
+        )
+      );
+      setDeleteConfirm({ isOpen: false, facultad: null });
+      showSuccess(
+        "Eliminado exitosamente",
+        "La facultad ha sido eliminada correctamente"
+      );
+    } catch (error) {
+      console.error("Error al eliminar la facultad:", error);
+      showError(
+        "Error al eliminar",
+        "No se pudo eliminar la facultad. Por favor, intenta de nuevo."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteConfirm({ isOpen: false, facultad: null });
+  };
 
   return (
     <div className="space-y-6">
@@ -46,6 +102,57 @@ const FacultadList = () => {
         </Link>
       </div>
 
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+          <div className="flex items-center">
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+              <span className="text-blue-600 text-xl">🏛️</span>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-600">
+                Total Facultades
+              </p>
+              <p className="text-2xl font-bold text-gray-900">
+                {facultades.length}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+          <div className="flex items-center">
+            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+              <span className="text-green-600 text-xl">✅</span>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-600">Activas</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {facultades.length}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+          <div className="flex items-center">
+            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+              <span className="text-purple-600 text-xl">📋</span>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-600">
+                Con Descripción
+              </p>
+              <p className="text-2xl font-bold text-gray-900">
+                {
+                  facultades.filter(
+                    (f) => f.descripcion && f.descripcion.trim() !== ""
+                  ).length
+                }
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Table */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
@@ -55,7 +162,7 @@ const FacultadList = () => {
                 ID
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Nombre
+                Descripción
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Acciones
@@ -68,8 +175,17 @@ const FacultadList = () => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {facultad.id}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {facultad.nombre}
+                <td className="px-6 py-4">
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                      <span className="text-blue-600 text-sm">🏛️</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 break-words">
+                        {facultad.descripcion || "Sin descripción"}
+                      </p>
+                    </div>
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex justify-end space-x-2">
@@ -85,8 +201,12 @@ const FacultadList = () => {
                     >
                       Editar
                     </Link>
-                    <button className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md transition-colors">
-                      Eliminar
+                    <button
+                      onClick={() => handleDelete(facultad.id)}
+                      disabled={loading}
+                      className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {loading ? "Eliminando..." : "Eliminar"}
                     </button>
                   </div>
                 </td>
@@ -126,6 +246,18 @@ const FacultadList = () => {
           </div>
         )}
       </div>
+
+      {/* Modal de confirmación para eliminar */}
+      <ConfirmDialog
+        isOpen={deleteConfirm.isOpen}
+        title="Eliminar Facultad"
+        message={`¿Estás seguro de que deseas eliminar esta facultad (ID: ${deleteConfirm.facultad?.id})? Esta acción no se puede deshacer.`}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        type="danger"
+      />
     </div>
   );
 };

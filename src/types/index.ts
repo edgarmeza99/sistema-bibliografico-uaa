@@ -1,10 +1,11 @@
 // Tipo para Facultad
 export interface Facultad {
-  id: number;
-  nombre: string;
-  descripcion?: string;
-  fechaCreacion: Date;
-  activo: boolean;
+  id: string;
+  descripcion: string;
+  // Campos opcionales para mantener compatibilidad si se necesitan más adelante
+  nombre?: string;
+  fechaCreacion?: Date;
+  activo?: boolean;
 }
 
 // Tipos para Materia
