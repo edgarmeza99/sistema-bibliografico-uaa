@@ -6,10 +6,10 @@ const Sidebar: React.FC = () => {
 
   const menuItems = [
     { path: "/", label: "Dashboard", icon: "📊" },
-    // { path: "/facultad", label: "Facultades", icon: "🏛️" },
+    { path: "/facultad", label: "Facultades", icon: "🏛️" },
     { path: "/materia", label: "Materias", icon: "📚" },
-    // { path: "/bibliografia", label: "Bibliografías", icon: "📖" },
-    // { path: "/autor", label: "Autores", icon: "👤" },
+    { path: "/bibliografia", label: "Bibliografías", icon: "📖" },
+    { path: "/autor", label: "Autores", icon: "👤" },
   ];
 
   return (

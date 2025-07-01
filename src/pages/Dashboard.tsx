@@ -88,7 +88,7 @@ const Dashboard = () => {
               Nueva Materia
             </span>
           </Link>
-          {/* <Link
+          <Link
             to="/bibliografia/new"
             className="flex items-center space-x-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors group"
           >
@@ -109,7 +109,7 @@ const Dashboard = () => {
             <span className="font-medium text-gray-700 group-hover:text-orange-600">
               Nuevo Autor
             </span>
-          </Link> */}
+          </Link>
         </div>
       </div>
 

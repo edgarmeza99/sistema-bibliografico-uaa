@@ -40,17 +40,20 @@ export interface Autor {
 // Tipo para Bibliografia
 export interface Bibliografia {
   id: number;
-  titulo: string;
+  recursos_principales: string;
+  recursos_secundarios?: string;
+  // Campos opcionales para mantener compatibilidad si se necesitan más adelante
+  titulo?: string;
   isbn?: string;
-  editorial: string;
-  fechaPublicacion: Date;
+  editorial?: string;
+  fechaPublicacion?: Date;
   descripcion?: string;
-  tipo: TipoBibliografia;
-  materiaId: number;
+  tipo?: TipoBibliografia;
+  materiaId?: number;
   materia?: Materia;
-  autores: Autor[];
-  fechaCreacion: Date;
-  activo: boolean;
+  autores?: Autor[];
+  fechaCreacion?: Date;
+  activo?: boolean;
 }
 
 // Enum para tipos de bibliografía

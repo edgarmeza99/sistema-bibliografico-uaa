@@ -14,38 +14,48 @@ import AutorDetail from "./pages/Autor/AutorDetail";
 import Layout from "./components/Layout";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
+import { ToastProvider } from "./components/ToastProvider";
 
 const App = () => {
   return (
-    <Router>
-      <Layout>
-        <Header />
-        <div className="flex">
-          <Sidebar />
-          <main className="flex-1 p-8 bg-gray-50 min-h-screen">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/facultad" element={<FacultadList />} />
-              <Route path="/facultad/new" element={<FacultadForm />} />
-              <Route path="/facultad/:id" element={<FacultadDetail />} />
-              <Route path="/materia" element={<MateriaList />} />
-              <Route path="/materia/new" element={<MateriaForm />} />
-              <Route path="/materia/edit/:id" element={<MateriaForm />} />
-              <Route path="/materia/:id" element={<MateriaDetail />} />
-              <Route path="/bibliografia" element={<BibliografiaList />} />
-              <Route path="/bibliografia/new" element={<BibliografiaForm />} />
-              <Route
-                path="/bibliografia/:id"
-                element={<BibliografiaDetail />}
-              />
-              <Route path="/autor" element={<AutorList />} />
-              {/* <Route path="/autor/new" element={<AutorForm />} /> */}
-              <Route path="/autor/:id" element={<AutorDetail />} />
-            </Routes>
-          </main>
-        </div>
-      </Layout>
-    </Router>
+    <ToastProvider>
+      <Router>
+        <Layout>
+          <Header />
+          <div className="flex">
+            <Sidebar />
+            <main className="flex-1 p-8 bg-gray-50 min-h-screen">
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/facultad" element={<FacultadList />} />
+                <Route path="/facultad/new" element={<FacultadForm />} />
+                <Route path="/facultad/:id" element={<FacultadDetail />} />
+                <Route path="/materia" element={<MateriaList />} />
+                <Route path="/materia/new" element={<MateriaForm />} />
+                <Route path="/materia/edit/:id" element={<MateriaForm />} />
+                <Route path="/materia/:id" element={<MateriaDetail />} />
+                <Route path="/bibliografia" element={<BibliografiaList />} />
+                <Route
+                  path="/bibliografia/new"
+                  element={<BibliografiaForm />}
+                />
+                <Route
+                  path="/bibliografia/edit/:id"
+                  element={<BibliografiaForm />}
+                />
+                <Route
+                  path="/bibliografia/:id"
+                  element={<BibliografiaDetail />}
+                />
+                <Route path="/autor" element={<AutorList />} />
+                {/* <Route path="/autor/new" element={<AutorForm />} /> */}
+                <Route path="/autor/:id" element={<AutorDetail />} />
+              </Routes>
+            </main>
+          </div>
+        </Layout>
+      </Router>
+    </ToastProvider>
   );
 };
 
