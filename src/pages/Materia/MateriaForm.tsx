@@ -49,7 +49,10 @@ const MateriaForm = () => {
         }
       } catch (error) {
         console.error("Error loading data:", error);
-        showError("Error al cargar", "No se pudieron cargar los datos necesarios");
+        showError(
+          "Error al cargar",
+          "No se pudieron cargar los datos necesarios"
+        );
       } finally {
         setLoadingData(false);
       }
@@ -96,15 +99,24 @@ const MateriaForm = () => {
     try {
       if (isEditing && id) {
         await updateMateriaService(id, materiaData);
-        showSuccess("Actualizado exitosamente", "La materia ha sido actualizada correctamente");
+        showSuccess(
+          "Actualizado exitosamente",
+          "La materia ha sido actualizada correctamente"
+        );
       } else {
         await createMateriaService(materiaData);
-        showSuccess("Creado exitosamente", "La materia ha sido creada correctamente");
+        showSuccess(
+          "Creado exitosamente",
+          "La materia ha sido creada correctamente"
+        );
       }
       navigate("/materia");
     } catch (error) {
       console.error("Error:", error);
-      showError("Error al guardar", "No se pudo guardar la materia. Por favor, intenta de nuevo.");
+      showError(
+        "Error al guardar",
+        "No se pudo guardar la materia. Por favor, intenta de nuevo."
+      );
     } finally {
       setLoading(false);
     }

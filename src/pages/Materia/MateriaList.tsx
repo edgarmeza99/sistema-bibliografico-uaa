@@ -56,7 +56,7 @@ const MateriaList = () => {
     } catch (error) {
       console.error("Error al eliminar la materia:", error);
       showError(
-        "Error al eliminar", 
+        "Error al eliminar",
         "No se pudo eliminar la materia. Por favor, intenta de nuevo."
       );
     } finally {
@@ -127,7 +127,7 @@ const MateriaList = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        {/* <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
           <div className="flex items-center">
             <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
               <span className="text-purple-600 text-xl">📖</span>
@@ -139,7 +139,7 @@ const MateriaList = () => {
               <p className="text-2xl font-bold text-gray-900">0</p>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Table */}
