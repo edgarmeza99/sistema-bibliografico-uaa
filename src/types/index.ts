@@ -30,12 +30,20 @@ export interface Autor {
   id: number;
   nombre: string;
   apellido: string;
-  email?: string;
   biografia?: string;
   fechaNacimiento?: Date;
   nacionalidad?: string;
   fechaCreacion: Date;
   activo: boolean;
+}
+
+// Tipo para crear/actualizar autor en la API
+export interface AutorApiData {
+  nombre: string;
+  apellido: string;
+  fecha_nacimiento?: Date;
+  nacionalidad?: string;
+  biografia?: string;
 }
 
 // Tipo para Bibliografia
