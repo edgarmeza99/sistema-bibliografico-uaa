@@ -165,9 +165,9 @@ const MateriaList = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Turno
               </th>
-              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              {/* <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Bibliografías
-              </th>
+              </th> */}
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Acciones
               </th>
@@ -206,14 +206,14 @@ const MateriaList = () => {
                       materia.turnos?.slice(1) || "Sin definir"}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center">
+                {/* <td className="px-6 py-4 whitespace-nowrap text-center">
                   <div className="flex items-center justify-center">
                     <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
                       {countBibliografias(materia)} bibliografía
                       {countBibliografias(materia) !== 1 ? "s" : ""}
                     </span>
                   </div>
-                </td>
+                </td> */}
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex justify-end space-x-2">
                     <Link
