@@ -4,6 +4,7 @@ import { getMaterias, deleteMateria } from "../../services/materiaService";
 import type { Materia } from "../../types";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import { useToast } from "../../components/ToastProvider";
+import { countBibliografias } from "../../utils/materiaUtils";
 
 const MateriaList = () => {
   const [materias, setMaterias] = useState<Materia[]>([]);
@@ -127,19 +128,24 @@ const MateriaList = () => {
             </div>
           </div>
         </div>
-        {/* <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
           <div className="flex items-center">
             <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
               <span className="text-purple-600 text-xl">📖</span>
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600">
-                Con Bibliografía
+                Con Bibliografías
               </p>
-              <p className="text-2xl font-bold text-gray-900">0</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {
+                  materias.filter((materia) => countBibliografias(materia) > 0)
+                    .length
+                }
+              </p>
             </div>
           </div>
-        </div> */}
+        </div>
       </div>
 
       {/* Table */}
@@ -158,6 +164,9 @@ const MateriaList = () => {
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Turno
+              </th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Bibliografías
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Acciones
@@ -196,6 +205,14 @@ const MateriaList = () => {
                     {materia.turnos?.charAt(0).toUpperCase() +
                       materia.turnos?.slice(1) || "Sin definir"}
                   </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-center">
+                  <div className="flex items-center justify-center">
+                    <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                      {countBibliografias(materia)} bibliografía
+                      {countBibliografias(materia) !== 1 ? "s" : ""}
+                    </span>
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex justify-end space-x-2">

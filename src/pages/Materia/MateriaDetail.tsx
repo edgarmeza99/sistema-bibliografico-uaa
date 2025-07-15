@@ -1,13 +1,28 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getMateriaById } from "../../services/materiaService";
-import type { Materia } from "../../types";
+import { getMateriaById, updateMateria } from "../../services/materiaService";
+import type { Materia, MateriaCreateData } from "../../types";
+import MateriaBibliografias from "../../components/MateriaBibliografias";
+import {
+  hasBibliografias,
+  countBibliografias,
+  extractBibliografiaIds,
+} from "../../utils/materiaUtils";
+import { useToast } from "../../components/ToastProvider";
+import ConfirmDialog from "../../components/ConfirmDialog";
 
 const MateriaDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [materia, setMateria] = useState<Materia | null>(null);
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<{
+    isOpen: boolean;
+    bibliografiaId: number | null;
+    bibliografiaTitulo: string;
+  }>({ isOpen: false, bibliografiaId: null, bibliografiaTitulo: "" });
+  const { showSuccess, showError } = useToast();
 
   useEffect(() => {
     const fetchMateria = async () => {
@@ -30,6 +45,76 @@ const MateriaDetail = () => {
 
     fetchMateria();
   }, [id]);
+
+  const handleRemoveBibliografia = (bibliografiaId: number) => {
+    if (!materia) return;
+
+    const bibliografia = materia.material_detalle?.find(
+      (item) => item.bibliografia_id === bibliografiaId
+    );
+
+    setConfirmDelete({
+      isOpen: true,
+      bibliografiaId,
+      bibliografiaTitulo: bibliografia?.recursos_principales || "Bibliografía",
+    });
+  };
+
+  const confirmRemoveBibliografia = async () => {
+    if (!materia || !confirmDelete.bibliografiaId || !id) return;
+
+    setUpdating(true);
+    try {
+      // Obtener IDs actuales y remover el seleccionado
+      const currentIds = extractBibliografiaIds(materia);
+      const updatedIds = currentIds.filter(
+        (bId) => bId !== confirmDelete.bibliografiaId
+      );
+
+      // Preparar datos para actualizar
+      const updateData: MateriaCreateData = {
+        facultad_id: parseInt(
+          materia.facultad_id?.toString() ||
+            materia.facultadId?.toString() ||
+            "0"
+        ),
+        nombre_materia: materia.nombre_materia,
+        turnos: materia.turnos,
+        creditos:
+          typeof materia.creditos === "string"
+            ? parseInt(materia.creditos)
+            : materia.creditos,
+        material_detalle: updatedIds,
+        codigo: materia.codigo || "",
+        descripcion: materia.descripcion || "",
+      };
+
+      // Actualizar materia
+      await updateMateria(id, updateData);
+
+      // Recargar datos
+      const updatedMateria = await getMateriaById(id);
+      setMateria(updatedMateria);
+
+      showSuccess(
+        "Bibliografía eliminada",
+        "La bibliografía ha sido removida de la materia correctamente"
+      );
+    } catch (error) {
+      console.error("Error al eliminar bibliografía:", error);
+      showError(
+        "Error al eliminar",
+        "No se pudo eliminar la bibliografía. Por favor, intenta de nuevo."
+      );
+    } finally {
+      setUpdating(false);
+      setConfirmDelete({
+        isOpen: false,
+        bibliografiaId: null,
+        bibliografiaTitulo: "",
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -230,19 +315,81 @@ const MateriaDetail = () => {
             </div>
           )}
 
-          {/* Material Detalle */}
-          {materia.material_detalle && (
+          {/* Bibliografías */}
+          {hasBibliografias(materia) && (
+            <div className="mt-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2 flex-1">
+                  Bibliografías de la Materia
+                </h3>
+                <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                  {countBibliografias(materia)} bibliografía
+                  {countBibliografias(materia) > 1 ? "s" : ""}
+                </span>
+              </div>
+              <MateriaBibliografias
+                bibliografias={materia.material_detalle || []}
+                titulo=""
+                maxVisible={10}
+                showRemoveButton={true}
+                onRemove={handleRemoveBibliografia}
+                disabled={updating}
+              />
+            </div>
+          )}
+
+          {/* Mensaje si no hay bibliografías */}
+          {!hasBibliografias(materia) && (
             <div className="mt-6">
               <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2 mb-4">
-                Material Detalle
+                Bibliografías de la Materia
               </h3>
-              <p className="text-gray-700 leading-relaxed">
-                {materia.material_detalle}
-              </p>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+                <div className="text-gray-400 text-4xl mb-2">📚</div>
+                <p className="text-gray-600 text-sm">
+                  No hay bibliografías asignadas a esta materia
+                </p>
+                <Link
+                  to={`/materia/edit/${materia.id}`}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-3"
+                >
+                  <svg
+                    className="w-4 h-4 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    />
+                  </svg>
+                  Agregar bibliografías
+                </Link>
+              </div>
             </div>
           )}
         </div>
       </div>
+
+      {/* Confirm Delete Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDelete.isOpen}
+        onCancel={() =>
+          setConfirmDelete({
+            isOpen: false,
+            bibliografiaId: null,
+            bibliografiaTitulo: "",
+          })
+        }
+        onConfirm={confirmRemoveBibliografia}
+        title="Confirmar eliminación de bibliografía"
+        message={`¿Estás seguro de que quieres eliminar "${confirmDelete.bibliografiaTitulo}" de esta materia? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        type="danger"
+      />
     </div>
   );
 };

@@ -11,15 +11,24 @@ export interface Facultad {
 // Tipos para Materia
 export type TurnoMateria = "mañana" | "tarde" | "noche";
 
+// Tipo para detalle de material bibliográfico en materia
+export interface MaterialDetalle {
+  id: number;
+  bibliografia_id: number;
+  recursos_principales: string;
+  recursos_secundarios?: string;
+}
+
 export interface Materia {
   id?: number;
   nombre_materia: string;
-  material_detalle?: string;
+  material_detalle?: MaterialDetalle[];
   codigo: string;
   descripcion?: string;
   creditos: number;
   turnos: TurnoMateria;
   facultadId?: number;
+  facultad_id?: string;
   facultad?: string;
   fechaCreacion: Date;
   activo: boolean;
@@ -51,6 +60,8 @@ export interface Bibliografia {
   id: number;
   recursos_principales: string;
   recursos_secundarios?: string;
+  // Solo un autor por bibliografía
+  autor?: Autor;
   // Campos opcionales para mantener compatibilidad si se necesitan más adelante
   titulo?: string;
   isbn?: string;
@@ -60,9 +71,15 @@ export interface Bibliografia {
   tipo?: TipoBibliografia;
   materiaId?: number;
   materia?: Materia;
-  autores?: Autor[];
   fechaCreacion?: Date;
   activo?: boolean;
+}
+
+// Tipo para crear/actualizar bibliografía en la API
+export interface BibliografiaApiData {
+  recursos_principales: string;
+  recursos_secundarios?: string;
+  autores_id?: number;
 }
 
 // Enum para tipos de bibliografía
@@ -85,6 +102,18 @@ export interface MateriaFormData {
   descripcion?: string;
   creditos: number;
   facultadId: number;
+  material_detalle?: number[];
+}
+
+// Tipo para enviar datos al backend
+export interface MateriaCreateData {
+  facultad_id: number;
+  nombre_materia: string;
+  turnos: TurnoMateria;
+  creditos: number;
+  material_detalle: number[];
+  codigo: string;
+  descripcion?: string;
 }
 
 export interface AutorFormData {

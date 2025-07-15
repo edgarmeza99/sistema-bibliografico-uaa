@@ -6,8 +6,21 @@ import {
   getMateriaById,
 } from "../../services/materiaService";
 import { getFacultades } from "../../services/facultadService";
-import type { TurnoMateria, Facultad } from "../../types";
+import { getBibliografias } from "../../services/bibliografiaService";
+import type {
+  TurnoMateria,
+  Facultad,
+  MateriaCreateData,
+  Bibliografia,
+} from "../../types";
 import { useToast } from "../../components/ToastProvider";
+import BibliografiaModalSelector from "../../components/BibliografiaModalSelector";
+import SelectedBibliografiasDisplay from "../../components/SelectedBibliografiasDisplay";
+import {
+  extractBibliografiaIds,
+  formatCreditos,
+  formatFacultadId,
+} from "../../utils/materiaUtils";
 
 const MateriaForm = () => {
   const { id } = useParams();
@@ -21,31 +34,49 @@ const MateriaForm = () => {
   const [creditos, setCreditos] = useState(0);
   const [turno, setTurno] = useState<TurnoMateria>("mañana");
   const [facultadId, setFacultadId] = useState("");
+  const [selectedBibliografias, setSelectedBibliografias] = useState<number[]>(
+    []
+  );
+  const [allBibliografias, setAllBibliografias] = useState<Bibliografia[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [facultades, setFacultades] = useState<Facultad[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
+
+  // Debug para el modal
+  useEffect(() => {
+    console.log("MateriaForm - isModalOpen changed:", isModalOpen);
+  }, [isModalOpen]);
 
   useEffect(() => {
     const loadInitialData = async () => {
       setLoadingData(true);
       try {
-        // Cargar facultades
-        const facultadesData = await getFacultades();
+        // Cargar facultades y bibliografías en paralelo
+        const [facultadesData, bibliografiasData] = await Promise.all([
+          getFacultades(),
+          getBibliografias(),
+        ]);
+
         setFacultades(facultadesData);
+        setAllBibliografias(bibliografiasData);
 
         // Si estamos editando, cargar datos de la materia
         if (id) {
           const materia = await getMateriaById(id);
           setNombre(materia.nombre_materia);
-          setCodigo(materia.codigo);
+          setCodigo(materia.codigo || "");
           setDescripcion(materia.descripcion || "");
-          setCreditos(materia.creditos);
+          setCreditos(formatCreditos(materia.creditos));
           setTurno(materia.turnos);
-          setFacultadId(
-            materia.facultadId !== undefined
-              ? materia.facultadId.toString()
-              : ""
-          );
+
+          // Manejar facultad_id que puede venir como string o number
+          const facultadIdValue = materia.facultad_id || materia.facultadId;
+          setFacultadId(formatFacultadId(facultadIdValue));
+
+          // Extraer IDs de bibliografías del material_detalle
+          const bibliografiaIds = extractBibliografiaIds(materia);
+          setSelectedBibliografias(bibliografiaIds);
         }
       } catch (error) {
         console.error("Error loading data:", error);
@@ -60,6 +91,29 @@ const MateriaForm = () => {
 
     loadInitialData();
   }, [id, showError]);
+
+  const handleOpenModal = () => {
+    console.log("Opening modal - current state:", isModalOpen);
+    setIsModalOpen(true);
+    console.log("Modal state after set:", true);
+  };
+
+  const handleCloseModal = () => {
+    console.log("Closing modal");
+    setIsModalOpen(false);
+  };
+
+  const handleBibliografiasChange = (newSelection: number[]) => {
+    // Evitar duplicados
+    const uniqueSelection = [...new Set(newSelection)];
+    setSelectedBibliografias(uniqueSelection);
+  };
+
+  const handleRemoveBibliografia = (bibliografiaId: number) => {
+    setSelectedBibliografias(
+      selectedBibliografias.filter((id) => id !== bibliografiaId)
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,13 +141,14 @@ const MateriaForm = () => {
 
     setLoading(true);
 
-    const materiaData = {
+    const materiaData: MateriaCreateData = {
+      facultad_id: parseInt(facultadId),
       nombre_materia: nombre.trim(),
+      turnos: turno,
+      creditos,
+      material_detalle: selectedBibliografias,
       codigo: codigo.trim(),
       descripcion: descripcion.trim(),
-      creditos,
-      turnos: turno,
-      facultadId: parseInt(facultadId),
     };
 
     try {
@@ -292,6 +347,24 @@ const MateriaForm = () => {
               disabled={loading}
             />
           </div>
+
+          {/* Bibliografia Selector */}
+          <SelectedBibliografiasDisplay
+            bibliografias={allBibliografias}
+            selectedIds={selectedBibliografias}
+            onRemove={handleRemoveBibliografia}
+            onOpenSelector={handleOpenModal}
+            disabled={loading}
+          />
+
+          {/* Modal de selección de bibliografías */}
+          <BibliografiaModalSelector
+            isOpen={isModalOpen}
+            onClose={handleCloseModal}
+            selectedBibliografias={selectedBibliografias}
+            onBibliografiasChange={handleBibliografiasChange}
+            disabled={loading}
+          />
 
           {/* Actions */}
           <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">

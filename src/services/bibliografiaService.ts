@@ -1,4 +1,4 @@
-import type { Bibliografia } from "../types";
+import type { BibliografiaApiData } from "../types";
 import { api } from "./api";
 
 export const getBibliografias = async () => {
@@ -11,14 +11,14 @@ export const getBibliografiaById = async (id: number | string) => {
   return response.data;
 };
 
-export const createBibliografia = async (bibliografia: Bibliografia) => {
+export const createBibliografia = async (bibliografia: BibliografiaApiData) => {
   const response = await api.post("/bibliografia", bibliografia);
   return response.data;
 };
 
 export const updateBibliografia = async (
   id: number | string,
-  bibliografia: Bibliografia
+  bibliografia: BibliografiaApiData
 ) => {
   const response = await api.put(`/bibliografia/${id}`, bibliografia);
   return response.data;

@@ -5,8 +5,11 @@ import {
   createBibliografia,
   updateBibliografia,
 } from "../../services/bibliografiaService";
-import type { Bibliografia } from "../../types";
+import { getAutores } from "../../services/autorService";
+import type { Bibliografia, Autor, BibliografiaApiData } from "../../types";
 import { useToast } from "../../components/ToastProvider";
+import AutorModalSelector from "../../components/AutorModalSelector";
+import SelectedAutoresDisplay from "../../components/SelectedAutoresDisplay";
 
 const BibliografiaForm = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,8 +19,36 @@ const BibliografiaForm = () => {
 
   const [recursosPrincipales, setRecursosPrincipales] = useState("");
   const [recursosSecundarios, setRecursosSecundarios] = useState("");
+  const [selectedAutor, setSelectedAutor] = useState<number | null>(null);
+  const [allAutores, setAllAutores] = useState<Autor[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
+
+  // Debug para el modal
+  useEffect(() => {
+    console.log("BibliografiaForm - isModalOpen changed:", isModalOpen);
+  }, [isModalOpen]);
+
+  useEffect(() => {
+    const fetchAutores = async () => {
+      setLoadingData(true);
+      try {
+        const autoresData = await getAutores();
+        setAllAutores(autoresData);
+      } catch (error) {
+        console.error("Error al cargar los autores:", error);
+        showError(
+          "Error al cargar",
+          "No se pudieron cargar los autores disponibles"
+        );
+      } finally {
+        setLoadingData(false);
+      }
+    };
+
+    fetchAutores();
+  }, []);
 
   useEffect(() => {
     if (isEdit && id) {
@@ -27,6 +58,10 @@ const BibliografiaForm = () => {
           const data: Bibliografia = await getBibliografiaById(id);
           setRecursosPrincipales(data.recursos_principales || "");
           setRecursosSecundarios(data.recursos_secundarios || "");
+          // Cargar autor seleccionado si existe
+          if (data.autor) {
+            setSelectedAutor(data.autor.id);
+          }
         } catch (error) {
           console.error("Error al cargar la bibliografía:", error);
           showError(
@@ -55,19 +90,27 @@ const BibliografiaForm = () => {
 
     setLoading(true);
     try {
-      const bibliografiaData = {
+      const bibliografiaData: BibliografiaApiData = {
         recursos_principales: recursosPrincipales.trim(),
         recursos_secundarios: recursosSecundarios.trim() || undefined,
       };
 
+      // Solo incluir autores_id si hay un autor seleccionado
+      if (selectedAutor) {
+        bibliografiaData.autores_id = selectedAutor;
+      }
+
+      console.log("Sending bibliografia data:", bibliografiaData);
+      console.log("Selected autor:", selectedAutor);
+
       if (isEdit && id) {
-        await updateBibliografia(id, bibliografiaData as Bibliografia);
+        await updateBibliografia(id, bibliografiaData);
         showSuccess(
           "Actualizado exitosamente",
           "La bibliografía ha sido actualizada correctamente"
         );
       } else {
-        await createBibliografia(bibliografiaData as Bibliografia);
+        await createBibliografia(bibliografiaData);
         showSuccess(
           "Creado exitosamente",
           "La bibliografía ha sido creada correctamente"
@@ -84,6 +127,31 @@ const BibliografiaForm = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleOpenModal = () => {
+    console.log("Opening autor modal - current state:", isModalOpen);
+    setIsModalOpen(true);
+    console.log("Modal state after set:", true);
+  };
+
+  const handleCloseModal = () => {
+    console.log("Closing autor modal");
+    setIsModalOpen(false);
+  };
+
+  const handleAutoresChange = (newSelection: number[]) => {
+    console.log("Autores selection changed:", newSelection);
+    // Solo tomar el primer autor seleccionado
+    const autorId = newSelection.length > 0 ? newSelection[0] : null;
+    setSelectedAutor(autorId);
+    console.log("Updated selected autor:", autorId);
+  };
+
+  const handleRemoveAutor = () => {
+    console.log("Removing autor");
+    setSelectedAutor(null);
+    console.log("After removal, selected autor:", null);
   };
 
   if (loadingData) {
@@ -162,6 +230,15 @@ const BibliografiaForm = () => {
             </p>
           </div>
 
+          {/* Selección de Autores */}
+          <SelectedAutoresDisplay
+            autores={allAutores}
+            selectedId={selectedAutor}
+            onRemove={handleRemoveAutor}
+            onOpenSelector={handleOpenModal}
+            disabled={loading}
+          />
+
           <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
             <button
               type="button"
@@ -204,6 +281,15 @@ const BibliografiaForm = () => {
           </div>
         </form>
       </div>
+
+      {/* Modal de selección de autores */}
+      <AutorModalSelector
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        selectedAutores={selectedAutor ? [selectedAutor] : []}
+        onAutoresChange={handleAutoresChange}
+        disabled={loading}
+      />
     </div>
   );
 };

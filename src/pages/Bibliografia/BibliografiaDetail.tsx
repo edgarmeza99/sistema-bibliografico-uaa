@@ -22,6 +22,8 @@ const BibliografiaDetail = () => {
 
       try {
         const data = await getBibliografiaById(id);
+        console.log("BibliografiaDetail - Data received:", data);
+        console.log("BibliografiaDetail - Autor data:", data.autor);
         setBibliografia(data);
       } catch (error) {
         console.error("Error al cargar la bibliografía:", error);
@@ -145,6 +147,46 @@ const BibliografiaDetail = () => {
                 {bibliografia.recursos_secundarios || "No especificado"}
               </p>
             </div>
+          </div>
+
+          {/* Autor */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Autor
+            </label>
+            {bibliografia.autor ? (
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                    <span className="text-orange-600 text-lg font-bold">
+                      {bibliografia.autor.nombre.charAt(0).toUpperCase()}
+                      {bibliografia.autor.apellido.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-lg font-medium text-orange-900">
+                      {bibliografia.autor.nombre} {bibliografia.autor.apellido}
+                    </p>
+                    {bibliografia.autor.nacionalidad && (
+                      <p className="text-sm text-orange-700 mt-1">
+                        Nacionalidad: {bibliografia.autor.nacionalidad}
+                      </p>
+                    )}
+                    {bibliografia.autor.biografia && (
+                      <p className="text-sm text-orange-600 mt-2">
+                        {bibliografia.autor.biografia}
+                      </p>
+                    )}
+                    <p className="text-xs text-orange-500 mt-2">ID: {bibliografia.autor.id}</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 text-center">
+                <div className="text-gray-400 text-2xl mb-2">👤</div>
+                <p className="text-gray-600 text-sm">No hay autor asignado</p>
+              </div>
+            )}
           </div>
         </div>
 
